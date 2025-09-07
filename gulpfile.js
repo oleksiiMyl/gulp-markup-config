@@ -37,6 +37,11 @@ gulp.task('script', () =>
     .pipe(gulp.dest('dist/scripts'))
 );
 
+function reload(done) {
+  browserSync.reload();
+  done();
+}
+
 gulp.task('serve', () => {
   browserSync.init({
     server: {
@@ -44,19 +49,17 @@ gulp.task('serve', () => {
     },
   });
 
-  gulp.watch('src/index.pug', gulp.series('pug', browserSync.reload));
-  gulp.watch('src/styles/main.scss', gulp.series('sass', browserSync.reload));
-  gulp.watch('src/scripts/main.js', gulp.series('script', browserSync.reload));
+  gulp.watch('src/**/*.pug', gulp.series('pug', reload));
+  gulp.watch('src/styles/**/*.scss', gulp.series('sass', reload));
+  gulp.watch('src/scripts/**/*.js', gulp.series('script', reload));
 });
 
-gulp.task('images', () =>
-  gulp
-    .src('src/images/**/*.+(png|jpg|jpeg|gif|svg)', { encoding: false })
-    .pipe(gulp.dest('dist/images'))
+gulp.task('assets', () =>
+  gulp.src('src/assets/**/*', { encoding: false }).pipe(gulp.dest('dist/assets'))
 );
 
 gulp.task('clean', () => del.deleteAsync('dist'));
 
 gulp.task('default', gulp.series('pug', 'sass', 'script', 'serve'));
 
-gulp.task('build', gulp.series('clean', 'pug', 'sass', 'script', 'images'));
+gulp.task('build', gulp.series('clean', 'pug', 'sass', 'script', 'assets'));
